@@ -1,9 +1,22 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPrismaClient } from '@/utils/db';
-export const GET = async () => {
+export const GET = async (req: NextRequest) => {
+    const searchParams = req.nextUrl.searchParams
+    const rawSearch = searchParams.get('search')
+    const search = rawSearch ? rawSearch.trim().toLowerCase() : null
+    
+
     try {
         const prisma = getPrismaClient();
-        const products: Product[] = await prisma.product.findMany();
+        const products: Product[] = await prisma.product.findMany(
+            {
+                where: {
+                    name: {
+                        contains: search || undefined,
+                    },
+                }
+            }
+        );
         return NextResponse.json(products || []);
         
     } catch (error) {

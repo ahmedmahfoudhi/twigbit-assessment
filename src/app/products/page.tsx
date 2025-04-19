@@ -1,5 +1,6 @@
 "use client";
 import ProductCard from "@/components/ProductCard";
+import Search from "@/components/Search";
 import Spinner from "@/components/Spinner";
 import { useEffect, useState } from "react";
 
@@ -10,10 +11,15 @@ const ProductsPage = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const fetchProducts = async () => {
+  const [searchItem, setSearchItem] = useState("");
+
+  const fetchProducts = async (searchItem: string | null) => {
     try {
       setLoading(true);
-      const response = await fetch("/api/products");
+      const endpoint = `/api/products${
+        searchItem ? `?search=${searchItem}` : ""
+      }`;
+      const response = await fetch(endpoint);
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }
@@ -35,6 +41,15 @@ const ProductsPage = () => {
   return (
     <div className="container mx-auto">
       <h1 className="text-4xl text-center mt-4">Products</h1>
+      <div className="flex gap-4">
+        <Search searchItem={searchItem} setSearchItem={setSearchItem} />
+        <button
+          onClick={() => fetchProducts(searchItem)}
+          className="px-12 cursor-pointer font-bold border rounded border-b-blue-500 text-b-blue-500"
+        >
+          Search
+        </button>
+      </div>
       {loading ? (
         <Spinner />
       ) : errorMessage ? (
