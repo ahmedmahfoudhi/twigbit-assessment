@@ -4,3 +4,5 @@ interface Product{
     description: string;
     price: number;
 }
+
+type ProductProps = Omit<Product, "id">;
